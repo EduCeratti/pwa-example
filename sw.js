@@ -2,40 +2,61 @@ self.addEventListener('install', function(event) {
   event.waitUntil(
     caches.open('v1').then(function(cache) {
       return cache.addAll([
-        '/sw-test/',
-        '/sw-test/index.html',
-        '/sw-test/style.css',
-        '/sw-test/app.js',
-        '/sw-test/image-list.js',
-        '/sw-test/star-wars-logo.jpg',
-        '/sw-test/gallery/bountyHunters.jpg',
-        '/sw-test/gallery/myLittleVader.jpg',
-        '/sw-test/gallery/snowTroopers.jpg'
+        '/',
+        '/index.html',
+        '/style.css',
+        '/app.js',
+        '/image-list.js',
+        '/star-wars-logo.jpg',
+        '/gallery/bountyHunters.jpg',
+        '/gallery/myLittleVader.jpg',
+        '/gallery/snowTroopers.jpg',
+        'https://s1.trrsf.com/fe/pwa-offline/offline.html'
       ]);
     })
   );
 });
 
+var PRIVATE = {};
+PRIVATE.requestTimeout = 20000;
+PRIVATE.isOffline = true;
+
+PRIVATE.fetchTimeout = function() {
+  "use strict";
+
+  return new Promise(function(resolve, reject) {
+      setTimeout(function(){
+          return reject('Request Timeout - '+ PRIVATE.requestTimeout +'ms');
+      }, PRIVATE.requestTimeout);
+  });
+};
+
 self.addEventListener('fetch', function(event) {
-  event.respondWith(caches.match(event.request).then(function(response) {
-    // caches.match() always resolves
-    // but in case of success response will have value
-    if (response !== undefined) {
-      return response;
-    } else {
-      return fetch(event.request).then(function (response) {
-        // response may be used only once
-        // we need to save clone to put one copy in cache
-        // and serve second one
-        let responseClone = response.clone();
-        
-        caches.open('v1').then(function (cache) {
-          cache.put(event.request, responseClone);
-        });
+
+  var requestIndex = event.request;
+  
+  //promises para simular o timeout do fetch
+  var promises = [
+    PRIVATE.fetchTimeout(),
+    PRIVATE.promiseRequestIndex = fetch(requestIndex).then(function(response){
+        if(!response.ok){
+            var status = response.status.toString();
+
+            //se der algum erro >= 500 entrega a pagina offline
+            if(status && status.charAt(0) === '5'){
+                return Promise.reject(response.status);
+            }
+        }
+
         return response;
-      }).catch(function () {
-        return caches.match('/sw-test/gallery/myLittleVader.jpg');
-      });
-    }
+    })
+  ];  
+
+  event.respondWith(Promise.race(promises).then(function(result){
+    PRIVATE.isOffline = false;
+    return result;
+  }, function(errorMessage){
+    PRIVATE.isOffline = true;
+    return caches.match('https://s1.trrsf.com/fe/pwa-offline/offline.html');
   }));
 });
