@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # sw-test
 
 Service Worker test repository. This is a very simple demo to show basic service worker features in action. The demo can be seen on [our GitHub pages](https://mdn.github.io/sw-test/).
@@ -26,3 +27,6 @@ python3 -m http.server 8001
 ```
 
 then you just open: [http://127.0.0.1:8001/index.html](http://127.0.0.1:8001/index.html)
+=======
+# pwa-example
+>>>>>>> d9b486a389cd58d01ecff96077f2aed7fde3dd0c
