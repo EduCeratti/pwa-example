@@ -4,14 +4,8 @@ self.addEventListener('install', function(event) {
       return cache.addAll([
         '/',
         '/index.html',
-        '/style.css',
-        '/app.js',
-        '/image-list.js',
-        '/star-wars-logo.jpg',
-        '/gallery/bountyHunters.jpg',
-        '/gallery/myLittleVader.jpg',
-        '/gallery/snowTroopers.jpg',
-        'https://s1.trrsf.com/fe/pwa-offline/offline.html'
+        'https://s1.trrsf.com/fe/pwa-offline/offline.html',
+        'https://s1.trrsf.com/fe/pwa-offline/_css/theme-default.min.css'
       ]);
     })
   );
